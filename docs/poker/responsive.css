@@ -1,0 +1,104 @@
+/* Responsive behavior is separate from the theme and poker logic.
+   <=1000px: coach below table. <=640px: flow-based table, no absolute seats.
+   Change both breakpoints here if your parent site's layout needs it. */
+html { -webkit-text-size-adjust: 100%; }
+body { min-width: 0; }
+header { min-height: 96px; height: auto; padding-block: 14px; gap: 14px; flex-wrap: wrap; }
+nav { align-items: center; flex-wrap: wrap; gap: 4px; }
+button,select,.homeLink { min-height: 44px; }
+input[type=number] { min-height: 44px; }
+input[type=range] { min-height: 44px; touch-action: pan-y; }
+button,.homeLink,summary { touch-action: manipulation; }
+.play,.coach,.workspace>* { min-width: 0; }
+.coach p,.status,.approx { overflow-wrap: anywhere; }
+.coach select { width: 100%; max-width: 100%; }
+.card { flex-shrink: 0; }
+.stack,.pot b { font-variant-numeric: tabular-nums; }
+.mode { min-height: 44px; }
+.raiseControls { flex-wrap: wrap; }
+.raiseControls input[type=range] { flex: 1 1 60px; }
+#actions .row { flex-wrap: wrap; }
+#actions .row>button { flex: 1 1 85px; min-height: 48px; }
+footer { flex-wrap: wrap; gap: 12px; }
+dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+.dialoghead { gap: 12px; }
+.dialoghead h2 { overflow-wrap: anywhere; }
+.dialoghead button { min-width: 44px; flex-shrink: 0; }
+@media (max-width: 1000px) {
+  .workspace { grid-template-columns: minmax(0,1fr); }
+  .coach { max-height: none; overflow: visible; }
+  .tabs { position: static; }
+  #sideContent { min-height: 0; }
+  .table { height: 510px; }
+  .seat.s0 { top: 386px; }
+  .seat { width: 145px; }
+  .center { top: 177px; }
+  .sizes { display: flex; }
+}
+@media (max-width: 640px) {
+  header { padding-block: 12px; gap: 8px; }
+  .brand { font-size: 18px; }
+  nav { width: 100%; justify-content: space-between; }
+  nav button,.homeLink { font-size: 13px; padding: 10px 8px; }
+  .topline { gap: 12px; align-items: flex-start; }
+  h1 { font-size: clamp(20px,5.3vw,25px); }
+  .topline p { font-size: 13px; line-height: 1.5; }
+  .mode { font-size: 12px; gap: 8px; flex-direction: column-reverse; align-items: flex-end; flex-shrink: 0; }
+  .tablebar { padding: 12px; flex-wrap: wrap; gap: 8px; }
+  .tablebar b { margin-left: 8px; }
+  .table {
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 22px 6px;
+    padding: 18px 8px;
+    align-items: center;
+  }
+  .felt { display: none; }
+  #seats { display: contents; }
+  .seat { position: static; transform: none; width: auto; min-width: 0; }
+  .seat.s2 { grid-column: 1; grid-row: 1; }
+  .seat.s3 { grid-column: 2; grid-row: 1; }
+  .seat.s4 { grid-column: 3; grid-row: 1; }
+  .seat.s1 { grid-column: 1; grid-row: 3; }
+  .seat.s0 { grid-column: 2; grid-row: 3; }
+  .seat.s5 { grid-column: 3; grid-row: 3; }
+  .center {
+    position: static; transform: none; width: 100%;
+    grid-column: 1 / -1; grid-row: 2;
+    padding: 16px 4px;
+    background: var(--felt);
+    border-block: 1px solid var(--felt-line);
+  }
+  .seatbox { padding: 8px 3px; }
+  .seatname { font-size: 13px; flex-wrap: wrap; }
+  .seatstyle { font-size: 12px; min-height: 29px; overflow-wrap: anywhere; }
+  .seat .stack { font-size: 16px; overflow-wrap: anywhere; }
+  .seat .seataction { font-size: 12px; line-height: 1.4; overflow-wrap: anywhere; }
+  .seat.s0 .seatbox { display: block; min-width: 0; width: 100%; padding: 8px 3px; }
+  .seat.s0 .seatname { display: block; }
+  .seat.s0 .stack { display: block; margin: 5px 0 0; font-size: 16px; }
+  .seat.s0 .card { width: clamp(31px,8.9vw,44px); height: 60px; padding: 5px; font-size: 22px; }
+  .seat:not(.s0) .card { width: 27px; height: 37px; }
+  .community .card { width: clamp(34px,10vw,48px); height: 66px; font-size: 23px; padding: 5px; }
+  .community .card .suit { font-size: 25px; }
+  .eyebrow { font-size: 12px; }
+  #tableMessage { max-width: none; font-size: 12px; line-height: 1.5; margin: 10px 0 0; }
+  .pot b { font-size: 29px; }
+  .actionarea { padding: 16px 12px calc(16px + env(safe-area-inset-bottom,0px)); }
+  #actions button { font-size: 14px; }
+  .raiseControls { gap: 8px; }
+  .raiseControls input[type=number] { font-size: 16px; width: 92px; }
+  .sizes { display: flex; width: 100%; }
+  .sizes button { flex: 1; }
+  #learningDepth,#statsSession,select { font-size: 16px; }
+  .status { font-size: 14px; }
+  .tabs { padding-inline: 18px; }
+  .tabs button { min-width: 60px; }
+  dialog { padding: 20px; }
+  .stackgrid { gap: 18px 12px; }
+  .stackgrid b { font-size: 20px; }
+  .coach p { font-size: 15px; }
+}
+@media (max-height: 500px) { .coach { max-height: none; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }

@@ -1,0 +1,9 @@
+/* Optional host-site customization. Loaded after the app CSS in production.
+   Edit the variables here to match your main website, without changing game code.
+   Example:
+   :root { --accent: #a5dbc3; --content-width: 1184px; --page-gutter: 24px; }
+   :root[data-theme=light] { --accent: #27654b; }
+   Variables: --bg, --surface, --raised, --text, --muted, --border,
+              --accent, --accenttext, --danger, --content-width, --page-gutter.
+   Keep contrasting foreground/background colors for readable game controls.
+*/

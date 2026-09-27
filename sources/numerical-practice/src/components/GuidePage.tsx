@@ -1,0 +1,41 @@
+import {useEffect,useRef,useState} from 'react';
+import {games} from '../../shared/model.mjs';
+import {tutorials,type TutorialGame} from './tutorials';
+import {tutorialDetails} from './tutorialDetails';
+import {guideExamples} from './guideExamples';
+const sections=[['walkthrough','See the screen'],['approach','Build your approach'],['scoring','Understand the score'],['settings','Set up practice']] as const;
+export default function GuidePage({route}:{route:string}){
+ const parts=route.split('/');const game=(Object.hasOwn(tutorials,parts[2])?parts[2]:'arithmetic') as TutorialGame;
+ const section=sections.some(([id])=>id===parts[3])?parts[3]:'walkthrough';
+ const guide=tutorials[game],detail=tutorialDetails[game],example=guideExamples[game];
+ const [step,setStep]=useState(0);const heading=useRef<HTMLHeadingElement>(null);
+ useEffect(()=>{setStep(0);heading.current?.focus({preventScroll:true});window.scrollTo(0,0);},[game,section]);
+ const isQuote=['dice','events','trading'].includes(game),hasReview=step===2;
+ return <main className="guide-page"><div className="pageheading"><div><p className="eyebrow">PRACTICE MANUAL</p><h1 ref={heading} tabIndex={-1}>Learn the game.</h1><p className="muted">Explore the controls. Work through an example. Then try it yourself.</p></div><a className="textlink" href="#/">← Practice dashboard</a></div>
+ <div className="guide-layout"><aside className="guide-sidebar"><p className="eyebrow">CHOOSE A GAME</p><nav aria-label="Game guides"><a href="#/guide/basics/start"><span>↗</span>Market basics · start here</a>{games.map((g,i)=><a key={g.id} href={`#/guide/${g.id}/walkthrough`} aria-current={g.id===game?'page':undefined}><span>{String(i+1).padStart(2,'0')}</span>{g.name}</a>)}</nav></aside>
+ <article className="guide-article"><div className="guide-title"><div><p className="eyebrow">{games.find(g=>g.id===game)?.category}</p><h2>{guide.name}</h2><p className="muted">{guide.goal}</p></div><a className="button primary" href={`#/play/${game}`}>Practice this game ↗</a></div>
+ {['dice','cards','events','trading','ev'].includes(game)&&<section className="basics-invite"><strong>New to market games?</strong><p>Learn bid/ask, long/short positions and profit with interactive examples before starting.</p><div className="actions"><a href="#/guide/basics/quotes">Bid & ask →</a><a href="#/guide/basics/pnl">Inventory & P&L →</a><a href="#/guide/basics/value">Fair value & edge →</a></div></section>}
+ <nav className="guide-sections" aria-label="Guide sections">{sections.map(([id,label])=><a key={id} aria-current={section===id?'page':undefined} href={`#/guide/${game}/${id}`}>{label}</a>)}</nav>
+ {section==='walkthrough'&&<>
+  <div className="guide-intro"><h3>A guided example</h3><p className="hint">Illustration built from the game’s UI styles. Choose a numbered step to highlight its part of the screen. This demo has no live timer and saves no progress.</p></div>
+  <div className="guide-demo-grid"><section className="guide-screen" aria-label={`${guide.name} interface illustration`}>
+   <div className="guide-demo-bar"><span>{guide.name}</span><span>{hasReview&&isQuote?'Review':example.timer}</span><span>{isQuote?'P&L +0.00':'Score 0'}</span></div>
+   <div className={`guide-zone ${step===0?'is-highlighted':''}`}><span className="guide-marker">1</span><p className="eyebrow">READ THE PROMPT</p><h3>{example.prompt}</h3><p className="hint">{example.subline}</p>
+    {example.cards&&<div className="playing-hand">{example.cards.map((n,i)=><div key={i} className={`playing-card ${n===0?'card-hidden':''}`}><span className="card-rank">{n||'?'}</span><span className="card-suit" aria-hidden="true">{n?['♠','♥','♦','♣'][i]:''}</span></div>)}</div>}
+    {example.series&&<div className="guide-series">{[...example.series,'?'].map((n,i)=><span key={i}>{n}</span>)}</div>}
+   </div>
+   <div className={`guide-zone ${step===1?'is-highlighted':''}`}><span className="guide-marker">2</span><p className="eyebrow">{isQuote?'QUOTE / TRADE':'ENTER YOUR ANSWER'}</p>
+    {example.fields.length>0&&<div className="guide-fields">{example.fields.map(([label,value])=><div className="guide-field" key={label}><span>{label}</span><div className="guide-input">{value}</div></div>)}</div>}
+    {example.book&&<><p className="hint">{game==='trading'?'Stage 2 · separate book (after your fill review)':'Dealer’s book'}</p><div className="guide-book"><div><small>BID · YOU SELL</small><strong>{example.book[0]}</strong></div><span>/</span><div><small>ASK · YOU BUY</small><strong>{example.book[1]}</strong></div></div><div className="guide-demo-actions" aria-label="Example controls"><span>Buy <kbd>B</kbd></span><span>Sell <kbd>S</kbd></span><span>Pass <kbd>P</kbd></span></div></>}
+    <p className="hint">{example.keys}</p>
+   </div>
+   <div className={`guide-zone guide-review-zone ${step===2?'is-highlighted':''}`}><span className="guide-marker">3</span><p className="eyebrow">{game==='arithmetic'?'IMMEDIATE FEEDBACK':'REVIEW THE RESULT'}</p>{hasReview?<><h3>{example.result}</h3><p>{example.calculation}</p><span className="guide-demo-next">{game==='arithmetic'?'Next prompt appears automatically':'Next problem ↵'}</span></>:<p className="muted">Select step 3 to reveal the worked result.</p>}</div>
+  </section><aside className="guide-callouts" aria-label="Example walkthrough">{['Read','Act','Review'].map((label,i)=><button key={label} className={step===i?'selected':''} aria-pressed={step===i} onClick={()=>setStep(i)}><span className="guide-step-number">{i+1}</span><strong>{label}</strong><span>{step===i?example.notes[i]:i===0?'Find the information you need.':i===1?'Locate the input or trade controls.':'See what the outcome means.'}</span></button>)}<div className="guide-step-controls"><button disabled={step===0} onClick={()=>setStep(step-1)}>← Back</button><button disabled={step===2} onClick={()=>setStep(step+1)}>Next step →</button></div></aside></div>
+  <details className="panel guide-more"><summary>Full rules and controls</summary><ol>{guide.steps.map(p=><li key={p}>{p}</li>)}</ol></details>
+ </>}
+ {section==='approach'&&<><h3>A repeatable way to think</h3><div className="guide-strategy">{detail.strategy.map((p,i)=><section className="panel" key={p}><span className="guide-step-number">{i+1}</span><p>{p}</p></section>)}</div><h3>Watch for these mistakes</h3>{detail.mistakes.map((p,i)=><details className="panel guide-more" key={p}><summary>Checkpoint {i+1}: {p.split(':')[0].split('.')[0]}</summary><p>{p}</p></details>)}</>}
+ {section==='scoring'&&<><section className="panel"><p className="eyebrow">WHAT COUNTS</p><h3>Your score</h3><p>{guide.score}</p></section><section className="guide-worked panel"><p className="eyebrow">WORKED EXAMPLE</p><h3>{example.result}</h3><p>{example.calculation}</p></section><section className="panel"><h3>Timing and saved progress</h3><p>{guide.timing}</p><p className="hint">Exit to dashboard discards an unfinished session. Existing results remain saved. Final-review games save on See results; timed sprints and Dice save when they finish.</p></section></>}
+ {section==='settings'&&<><section className="panel"><h3>Choose your challenge</h3><p>{detail.settings}</p></section><div className="guide-strategy"><section className="panel"><p className="eyebrow">01 / START SMALL</p><h3>Choose Easy</h3><p>Learn the controls first. Read one review carefully before increasing the difficulty.</p></section><section className="panel"><p className="eyebrow">02 / CUSTOMIZE</p><h3>Change one setting</h3><p>Adjust time, number ranges or the game-specific rules on its setup page. An edited setup becomes Custom.</p></section><section className="panel"><p className="eyebrow">03 / REPEAT</p><h3>Save a named preset</h3><p>Use the same settings next time so your scores are easier to compare. History can filter by difficulty.</p></section></div><a className="button primary" href={`#/play/${game}`}>Open {guide.name} setup ↗</a></>}
+ <div className="guide-footer"><span className="muted">{sections.findIndex(([id])=>id===section)+1} / 4 sections</span>{section!=='settings'&&<a className="button" href={`#/guide/${game}/${sections[sections.findIndex(([id])=>id===section)+1][0]}`}>Continue: {sections[sections.findIndex(([id])=>id===section)+1][1]} →</a>}</div>
+ </article></div></main>;
+}

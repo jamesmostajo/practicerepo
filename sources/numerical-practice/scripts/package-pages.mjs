@@ -1,0 +1,11 @@
+import {readFile,mkdir,cp,writeFile,rm} from 'node:fs/promises';
+import path from 'node:path';
+const root=path.resolve(import.meta.dirname,'..');
+const config=JSON.parse(await readFile(path.join(root,'site.config.json'),'utf8'));
+const folder=config.subdirectory;
+if(typeof folder!=='string'||!folder.split('/').every(s=>/^[a-zA-Z0-9_-]+$/.test(s)))throw Error('subdirectory must contain safe path segments, e.g. quant-practice or tools/quant-practice.');
+if(typeof config.parentSiteUrl!=='string'||/^(?:javascript|data):/i.test(config.parentSiteUrl))throw Error('Use a normal relative path or HTTPS URL for parentSiteUrl.');
+const output=path.join(root,'pages-site');await rm(output,{recursive:true,force:true});await mkdir(output,{recursive:true});
+await cp(path.join(root,'dist-static'),path.join(output,folder),{recursive:true});
+await writeFile(path.join(output,'.nojekyll'),'');
+console.log(`Static subpage ready: pages-site/${folder}/. Merge this folder into your existing site's published output.`);

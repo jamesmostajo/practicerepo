@@ -1,0 +1,9 @@
+{
+  "name": "practice-table-pages-package",
+  "version": "1.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/test-learning.mjs && node tests/test-ui.mjs && node tests/check-paths.mjs"
+  }
+}

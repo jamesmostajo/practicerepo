@@ -1,0 +1,28 @@
+{
+  "name": "quant-practice",
+  "version": "1.5.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "node server/index.mjs",
+    "build": "tsc --noEmit && vite build",
+    "start": "node server/index.mjs --production",
+    "test": "node --test tests/*.test.mjs",
+    "build:pages": "tsc --noEmit && vite build --mode pages && node scripts/package-pages.mjs",
+    "preview:pages": "vite preview --mode pages --host 127.0.0.1"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3",
+    "vite": "8.0.13"
+  }
+}

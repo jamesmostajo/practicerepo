@@ -1,0 +1,34 @@
+/*
+  Small Table style overrides
+  ---------------------------
+  This file loads after the built-in styles in index.html. Edit it freely;
+  game rules and AI logic are unaffected.
+*/
+:root {
+  --site-content-width: 1180px;
+  --game-content-width: 1440px;
+  --mobile-gutter: 15px;
+}
+
+.wrap { max-width: var(--site-content-width); }
+:root[data-view="game"] .wrap { max-width: var(--game-content-width); }
+
+/* Mobile layout overrides belong here. The app switches at 759px. */
+@media (max-width: 759px) {
+  .wrap {
+    padding-left: max(var(--mobile-gutter), env(safe-area-inset-left));
+    padding-right: max(var(--mobile-gutter), env(safe-area-inset-right));
+  }
+}
+
+/*
+  Example palette override — remove the comment markers to enable it.
+
+  :root {
+    --bg: #f6f2e8;
+    --paper: #fffdf7;
+    --accent: #315f55;
+  }
+*/
+
+.hub-link{color:var(--accent);text-underline-offset:4px;padding:8px 0}.hub-link:focus-visible{outline:3px solid var(--accent);outline-offset:4px}

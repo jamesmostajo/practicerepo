@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f4ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171e1c" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Small Table">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<title>Small Table — Three games of imperfect information</title>
+<style>
+/* ---------- Theme & foundations ---------- */
+:root{--bg:#f5f4ef;--paper:#fffefa;--ink:#252e2c;--muted:#69726e;--line:#dedfd7;--accent:#276b5b;--soft:#e6efe9;--red:#b65642;--redsoft:#f6e9e3;--shadow:0 12px 40px #21382e08;--radius:18px;color-scheme:light}
+:root[data-theme=dark]{--bg:#171e1c;--paper:#202925;--ink:#e5eae3;--muted:#a2aea5;--line:#3a453e;--accent:#92c9b3;--soft:#2b4136;--red:#efab95;--redsoft:#46352e;--shadow:0 12px 40px #0002;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:background .2s,color .2s}button,select{font:inherit}button{cursor:pointer;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:10px 16px;transition:background .15s,transform .15s,border-color .15s}button:hover:not(:disabled){border-color:var(--accent);background:var(--soft)}button:active:not(:disabled){transform:translateY(1px)}button:disabled{opacity:.4;cursor:not-allowed}button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.primary{background:var(--accent);border-color:var(--accent);color:var(--paper);font-weight:650}:root[data-theme=dark] .primary{color:#172b22}.primary:hover:not(:disabled){background:var(--accent);filter:brightness(1.08)}.quiet{background:transparent}.small{padding:7px 11px;font-size:13px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:11px;font-weight:750;color:var(--muted)}h1,h2,h3,p{margin:0}h1{font-size:clamp(36px,6vw,66px);line-height:1.08;letter-spacing:-.055em;font-weight:550}h2{font-size:27px;line-height:1.2;letter-spacing:-.035em;font-weight:600}h3{font-size:18px;font-weight:600;letter-spacing:-.02em}.muted{color:var(--muted)}.red{color:var(--red)}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.between{justify-content:space-between}.stack{display:grid;gap:16px}.hidden{display:none!important}.pill{border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:12px;color:var(--muted)}.wrap{max-width:1180px;margin:auto;padding:0 32px}header{height:82px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:-.02em}.brand-mark{display:inline-grid;place-items:center;width:29px;height:33px;border:1.5px solid var(--accent);border-radius:5px;color:var(--accent);font-size:19px;transform:rotate(-8deg)}.theme{min-width:82px}footer{padding:30px 0;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:12px;border-top:1px solid var(--line);margin-top:40px}
+/* ---------- Home ---------- */
+.intro{padding:72px 0 48px;max-width:710px}.intro .eyebrow{margin-bottom:20px}.intro p{max-width:490px;margin-top:22px;font-size:17px;color:var(--muted)}.games{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.game-tile{padding:24px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:flex-start;gap:15px}.game-tile p{color:var(--muted);min-height:48px}.game-tile .primary{margin-top:8px;width:100%;text-align:left;display:flex;justify-content:space-between}.tile-meta{font-size:12px;color:var(--muted)}.art{height:140px;width:100%;display:flex;align-items:center;justify-content:center;margin:0 0 5px}.art .mini{width:66px;height:94px;display:flex;flex-direction:column;justify-content:space-between;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:7px;font-size:20px;line-height:1.1}.art .mini:nth-child(1){transform:rotate(-12deg);margin-right:-12px}.art .mini:nth-child(2){transform:rotate(9deg);margin-top:14px}.art .mini span:last-child{align-self:flex-end}.mini.back{background:var(--soft);color:var(--accent);justify-content:center;align-items:center}.home-note{margin-top:28px;display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
+/* ---------- Table ---------- */
+.game-chrome{position:sticky;top:0;z-index:10;background:var(--bg)}.game-nav{background:var(--bg);padding:17px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}.game-nav h2{font-size:20px}.game-nav .eyebrow{font-size:9px}.scoreboard{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px 0}.player{padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:var(--paper);transition:border-color .2s}.player.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}.player.out{opacity:.48}.player-name{font-weight:650;display:flex;align-items:center;justify-content:space-between;gap:6px}.player small{font-size:11px;color:var(--muted);font-weight:400}.player-value{display:flex;align-items:baseline;gap:7px;margin-top:5px}.player-value strong{font-size:24px;line-height:1.3;font-weight:550;font-variant-numeric:tabular-nums}.player-value span{color:var(--muted);font-size:12px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 254px;gap:20px;align-items:start}.table-panel,.hand-panel,.record{border:1px solid var(--line);background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow)}.table-panel{padding:26px;min-height:260px;display:flex;flex-direction:column;gap:20px;justify-content:center}.table-panel h2{font-size:28px}.table-panel p{color:var(--muted);max-width:590px}.table-panel .eyebrow{color:var(--accent)}.center-cards{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap}.reveal-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;max-width:125px;text-align:center}.reveal-item .card{margin:0}.reveal-item>span{color:var(--muted)}.hand-panel{padding:22px 26px;margin-top:16px}.hand-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.hand-title p{font-size:12px;color:var(--muted)}.hand{display:flex;gap:9px;flex-wrap:wrap;margin:8px 0 20px}.card{width:70px;height:100px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;line-height:1;font-size:22px;font-weight:550;box-shadow:0 3px 7px #00000005;flex-shrink:0}.card .suit{align-self:flex-end;font-size:25px}.card.red{color:var(--red)}button.card:hover:not(:disabled){transform:translateY(-4px)}.card.selected{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px;background:var(--soft);transform:translateY(-4px)}.card.back{background:var(--soft);color:var(--accent);align-items:center;justify-content:center;font-size:23px}.card.back:before{content:'◇';border:1px solid var(--accent);padding:14px 10px;border-radius:4px;opacity:.65}.card.revealed{animation:reveal .35s ease both}.card.tiny{width:40px;height:56px;padding:5px;font-size:13px;border-radius:5px;box-shadow:none}.card.tiny .suit{font-size:15px}.controls{display:grid;gap:16px}.field{display:grid;gap:7px}.field-label{font-size:12px;color:var(--muted);font-weight:600}.targets{display:flex;gap:8px;flex-wrap:wrap}.targets button.selected{border-color:var(--accent);background:var(--soft);color:var(--accent)}select{padding:10px 32px 10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);max-width:150px}.action-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:3px}.action-hint{font-size:12px;color:var(--muted)}.defense-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.defense-actions button{padding:13px 9px;text-align:left}.defense-actions .primary span{color:inherit;opacity:.85}.defense-actions b{display:block;font-weight:600;font-size:14px}.defense-actions span{display:block;font-size:11px;margin-top:5px;color:var(--muted)}.record{padding:20px}.record h3{font-size:14px;margin-bottom:13px}.log{list-style:none;padding:0;margin:0;max-height:330px;overflow:auto}.log li{font-size:12px;padding:11px 0;border-bottom:1px solid var(--line);color:var(--muted)}.log li:first-child{padding-top:0;color:var(--ink)}.log li:last-child{border-bottom:0}.record-note{font-size:11px;color:var(--muted);padding-top:15px;border-top:1px solid var(--line);margin-top:14px}.knowledge{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;font-size:12px;color:var(--muted)}.knowledge strong{color:var(--ink)}.discard-section{margin-top:22px}.discard-section h3{font-size:14px;margin-bottom:10px}.discard-player{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.discard-player>span{width:58px;flex-shrink:0;font-size:12px;color:var(--muted);padding-top:6px}.discard-row{display:flex;gap:5px;flex-wrap:wrap}.loading{display:inline-flex;gap:5px;align-items:center;color:var(--muted);font-size:13px}.loading:before{content:'';height:6px;width:6px;border-radius:50%;background:var(--accent);animation:breathe 1s ease infinite}.result-actions{margin-top:5px}.score-delta{font-size:12px;color:var(--accent);font-weight:600}.status-line{font-size:12px;color:var(--muted);display:flex;gap:15px;flex-wrap:wrap;margin-bottom:13px}.empty{font-size:12px;color:var(--muted);padding:6px 0}.announcement{border-left:2px solid var(--accent);padding-left:12px;font-size:13px;color:var(--muted)}
+/* ---------- Dialog & responsive ---------- */
+dialog{width:min(570px,calc(100% - 32px));max-height:85vh;border:1px solid var(--line);border-radius:18px;padding:28px;background:var(--paper);color:var(--ink);box-shadow:0 24px 100px #0003}dialog::backdrop{background:#15211bc0;backdrop-filter:blur(3px)}dialog h2{font-size:25px}dialog .rules-body{margin:22px 0 8px;color:var(--muted);font-size:14px}dialog p{margin-bottom:14px}dialog ol{padding-left:22px}dialog li{padding:5px 0}dialog strong{color:var(--ink)}@keyframes reveal{from{opacity:.3;transform:translateY(7px) rotateY(50deg)}to{opacity:1;transform:none}}@keyframes breathe{50%{opacity:.3}}@media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}}@media(max-width:900px){.layout{grid-template-columns:1fr}.record{margin-top:0}.log{max-height:150px}.record-note{margin-top:8px}.game-tile{padding:20px}.wrap{padding:0 22px}.intro{padding-top:50px}}@media(max-width:650px){.games{grid-template-columns:1fr}.game-tile{display:grid;grid-template-columns:1fr 90px;gap:10px 15px}.game-tile .art{grid-column:2;grid-row:1/5;height:100%;margin:0}.art .mini{width:43px;height:66px;font-size:15px;padding:6px}.game-tile p{min-height:0;font-size:14px}.game-tile .primary{grid-column:1/3}.game-tile h2{font-size:25px}.intro{padding:42px 0 30px}.intro p{font-size:15px}.scoreboard{gap:6px;padding:14px 0}.player{padding:10px 8px}.player-name{font-size:12px}.player small{display:none}.player-value{gap:4px}.player-value strong{font-size:22px}.player-value span{font-size:10px}.wrap{padding:0 15px}header{height:66px}.game-nav{padding:12px 0}.game-nav h2{font-size:16px}.game-nav .eyebrow{display:none}.game-nav button{font-size:12px;padding:8px 10px}.table-panel{padding:20px;min-height:220px}.table-panel h2{font-size:24px}.hand-panel{padding:20px}.card{width:59px;height:86px;font-size:20px;padding:8px}.card .suit{font-size:22px}.hand{gap:8px}.defense-actions{grid-template-columns:1fr}.defense-actions button{display:flex;align-items:center;justify-content:space-between;gap:10px}.defense-actions span{margin:0;text-align:right}.center-cards{gap:12px}.reveal-item{max-width:75px;font-size:11px}.status-line{gap:9px}footer{margin-top:28px}.home-note{align-items:flex-start}.home-note .dot{margin-top:7px;flex-shrink:0}}
+/* ---------- Viewport-sized desktop table ---------- */
+:root[data-view=game] footer{display:none}
+:root[data-view=game] .wrap{max-width:1440px}
+:root[data-view=game] header{height:48px}
+:root[data-view=game] .game-nav{padding:9px 0}
+:root[data-view=game] .game-nav .eyebrow{display:none}
+:root[data-view=game] .scoreboard{padding:10px 0;gap:8px}
+:root[data-view=game] .player{padding:8px 12px}
+:root[data-view=game] .player-value{margin-top:0}
+:root[data-view=game] .player-value strong{font-size:22px}
+:root[data-view=game] .status-line{margin-bottom:10px}
+:root[data-view=game] .table-panel{min-height:0;padding:20px;gap:14px}
+:root[data-view=game] .table-panel h2{font-size:25px}
+:root[data-view=game] .hand-panel{padding:18px}
+:root[data-view=game] .hand-title{margin-bottom:10px}
+:root[data-view=game] .hand{margin:5px 0 12px;gap:7px}
+:root[data-view=game] .card{width:53px;height:76px;font-size:19px;padding:8px}
+:root[data-view=game] .card .suit{font-size:21px}
+:root[data-view=game] .card.tiny{width:31px;height:43px;font-size:11px;padding:4px}
+:root[data-view=game] .card.tiny .suit{font-size:12px}
+:root[data-view=game] .controls{gap:12px}
+:root[data-view=game] .defense-actions{grid-template-columns:1fr}
+:root[data-view=game] .defense-actions button{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px}
+:root[data-view=game] .defense-actions span{margin:0;text-align:right}
+:root[data-view=game] .record{padding:15px}
+:root[data-view=game] .record-note{padding-top:10px;margin-top:10px}
+:root[data-view=game] .knowledge{margin-top:8px;padding-top:10px}
+:root[data-view=game] .center-cards{gap:10px}
+:root[data-view=game] .reveal-item{max-width:80px}
+@media(min-width:760px){
+  :root[data-view=game] .layout{grid-template-columns:minmax(0,1fr) 195px;gap:14px;height:calc(100dvh - 213px);min-height:360px;align-items:stretch;padding-bottom:12px}
+  :root[data-view=game] .play-area{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.18fr);grid-template-rows:minmax(0,1fr) auto;gap:14px;min-height:0;min-width:0}
+  :root[data-view=game] .table-panel{justify-content:flex-start;overflow:auto;min-width:0;scrollbar-width:thin}
+  :root[data-view=game] .hand-panel{margin:0;overflow:auto;min-width:0;scrollbar-width:thin}
+  :root[data-view=game] .record{display:flex;flex-direction:column;min-height:0;overflow:auto;scrollbar-width:thin}
+  :root[data-view=game] .log{flex:1;max-height:none;min-height:60px}
+  :root[data-view=game] .record-note,:root[data-view=game] .record .knowledge{flex-shrink:0}
+  :root[data-view=game] .discard-section{grid-column:1/-1;margin:0;max-height:132px;overflow:auto;scrollbar-width:thin;border-top:1px solid var(--line);padding-top:8px}
+  :root[data-view=game] .discard-section h3{margin-bottom:4px;font-size:12px}
+  :root[data-view=game] .discard-player{padding:5px 0}
+  :root[data-view=game] .discard-row{gap:4px}
+  :root[data-phase=over] .table-panel,:root[data-spectating=true] .table-panel{grid-column:1/-1}
+  :root[data-view=game] .hand-title p{white-space:nowrap}
+}
+@media(min-width:760px) and (max-width:1080px){
+  :root[data-view=game] .layout{grid-template-columns:minmax(0,1fr) 166px;gap:10px}
+  :root[data-view=game] .play-area{gap:10px}
+  :root[data-view=game] .table-panel,:root[data-view=game] .hand-panel{padding:14px}
+  :root[data-view=game] .card{width:45px;height:64px;padding:6px;font-size:17px}
+  :root[data-view=game] .hand{gap:5px}
+  :root[data-view=game] .targets button{padding:7px 9px;font-size:13px}
+  :root[data-view=game] .table-panel h2{font-size:22px}
+  :root[data-view=game] .defense-actions button{display:block;text-align:left}
+  :root[data-view=game] .defense-actions span{text-align:left;margin-top:3px}
+}
+@media(min-width:760px) and (max-height:760px){
+  :root[data-view=game] .table-panel,:root[data-view=game] .hand-panel{padding:14px;gap:10px}
+  :root[data-view=game] .card{height:63px;width:45px;padding:6px;font-size:17px}
+  :root[data-view=game] .hand-title{margin-bottom:7px}
+  :root[data-view=game] .controls{gap:9px}
+  :root[data-view=game] .field{gap:5px}
+  :root[data-view=game] .action-row button,:root[data-view=game] .targets button{padding:8px 11px}
+  :root[data-view=game] .discard-section{max-height:105px}
+  :root[data-view=game] .record-note{font-size:10px}
+  :root[data-view=game] .record .knowledge{font-size:11px}
+}
+@media(max-width:759px){
+  :root[data-view=game] .layout{display:block}
+  :root[data-view=game] .table-panel{padding:16px;gap:10px}
+  :root[data-view=game] .hand-panel{margin-top:10px;padding:15px}
+  :root[data-view=game] .record{margin-top:14px}
+  :root[data-view=game] .table-panel p{font-size:13px}
+}
+@media(min-width:760px) and (max-height:800px){
+  :root[data-view=home] header{height:54px}
+  :root[data-view=home] .intro{padding:28px 0 25px}
+  :root[data-view=home] .intro h1{font-size:46px}
+  :root[data-view=home] .intro .eyebrow{margin-bottom:12px}
+  :root[data-view=home] .intro p{margin-top:13px;font-size:15px}
+  :root[data-view=home] .game-tile{padding:19px;gap:10px}
+  :root[data-view=home] .art{height:77px;margin:6px 0 12px}
+  :root[data-view=home] .art .mini{height:67px;width:47px;padding:7px;font-size:16px}
+  :root[data-view=home] .game-tile h2{font-size:25px}
+  :root[data-view=home] .game-tile p{font-size:14px;min-height:44px}
+  :root[data-view=home] .home-note{margin-top:17px}
+  :root[data-view=home] footer{margin-top:18px;padding:15px 0}
+}
+
+/* ---------- Crossfire: every played card stays on the board ---------- */
+:root[data-game=cf] .layout{display:block;height:auto;min-height:0;padding-bottom:10px}
+:root[data-game=cf] .play-area{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto auto;gap:12px}
+:root[data-game=cf] .table-panel,:root[data-game=cf] .hand-panel{overflow:visible;min-height:0;margin:0;padding:16px;gap:10px}
+:root[data-game=cf] .table-panel{justify-content:center}
+:root[data-game=cf] .table-panel h2{font-size:23px}
+:root[data-game=cf] .table-panel p{font-size:13px}
+:root[data-game=cf] .hand{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:0 0 10px}
+:root[data-game=cf] .hand .card{width:100%;max-width:70px;height:58px;padding:6px;font-size:18px}
+:root[data-game=cf] .hand .card .suit{font-size:18px}
+:root[data-game=cf] .controls{grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px}
+:root[data-game=cf] .controls>.action-hint,:root[data-game=cf] .action-row>.action-hint{display:none}
+:root[data-game=cf] .action-row{margin:0}
+:root[data-game=cf] .targets{gap:5px}
+:root[data-game=cf] .targets button,:root[data-game=cf] .action-row button{font-size:13px;padding:9px 12px}
+:root[data-game=cf] .center-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+:root[data-game=cf] .reveal-item{max-width:none;font-size:11px;gap:4px}
+:root[data-game=cf] .reveal-item .card{width:43px;height:57px;font-size:17px;padding:6px}
+:root[data-game=cf] .discard-section{grid-column:1/-1;max-height:none;height:auto;overflow:visible;margin:0;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper)}
+.played-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+:root[data-game=cf] .played-title h3{margin:0;font-size:13px}
+.played-title p{font-size:11px;color:var(--muted)}
+.played-matrix{display:grid;gap:4px;font-variant-numeric:tabular-nums}
+.matrix-row{display:grid;grid-template-columns:44px repeat(13,minmax(0,1fr));gap:4px;align-items:center}
+.matrix-row>[role=rowheader]{font-size:12px;font-weight:600}
+.matrix-head{font-size:10px;color:var(--muted);text-align:center;line-height:1.2}
+.matrix-head>span:first-child{text-align:left}
+.spent-token{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;height:34px;border:1px solid var(--line);border-radius:5px;background:var(--bg);line-height:1.1}
+.spent-token .played-rank{font-size:13px;white-space:nowrap;font-weight:600}
+.spent-token small{font-size:9px;color:var(--muted);margin-top:2px}
+.spent-token.unplayed{color:var(--line);background:transparent;border-style:dashed}
+.spent-token.latest{border-color:var(--accent);background:var(--soft)}
+:root[data-game=cf][data-phase=result] .table-panel>.eyebrow{display:none}
+:root[data-game=cf][data-phase=result] .result-actions{margin-top:0}
+:root[data-game=cf][data-phase=over] .table-panel{grid-column:1/-1}
+:root[data-game=cf][data-phase=over] .controls:empty{display:none}
+@media(min-width:760px) and (max-height:760px){
+  :root[data-game=cf] .table-panel,:root[data-game=cf] .hand-panel{padding:12px;gap:8px}
+  :root[data-game=cf] .hand .card{height:52px}
+  :root[data-game=cf] .discard-section{padding:9px 12px}
+  :root[data-game=cf] .play-area{gap:10px}
+  :root[data-game=cf] .hand-title{margin-bottom:8px}
+}
+/* Phones: larger tap targets, a two-row hand, and a complete four-seat ledger. */
+@media(max-width:759px){
+  .wrap{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right))}
+  button{touch-action:manipulation}
+  :root[data-view=game] header{height:36px}
+  :root[data-view=game] .brand{font-size:13px;gap:7px}
+  :root[data-view=game] .brand-mark{width:20px;height:23px;font-size:14px;border-radius:4px}
+  :root[data-view=game] .theme{font-size:11px;padding:5px 8px;min-width:72px}
+  :root[data-view=game] .game-nav{padding:5px 0;gap:6px}
+  :root[data-view=game] .game-nav h2{font-size:15px}
+  :root[data-view=game] .game-nav button{padding:7px 9px;font-size:11px}
+  :root[data-view=game] .scoreboard{padding:6px 0;gap:5px}
+  :root[data-view=game] .player{padding:5px 8px;border-radius:8px}
+  :root[data-view=game] .player-name{font-size:11px}
+  :root[data-view=game] .player-value strong{font-size:19px}
+  :root[data-view=game] .status-line{font-size:10px;margin-bottom:6px;gap:8px}
+  :root[data-view=game] .table-panel{padding:12px;gap:8px}
+  :root[data-view=game] .table-panel h2{font-size:20px}
+  :root[data-view=game] .eyebrow{font-size:9px}
+  :root[data-view=game] .hand-panel{padding:12px}
+  :root[data-view=game] .hand-title{margin-bottom:8px}
+  :root[data-view=game] .hand-title h3{font-size:14px}
+  :root[data-view=game] .hand .card{min-height:56px}
+  :root[data-view=game] .targets button{min-height:40px}
+  :root[data-view=game] .controls{gap:9px}
+  :root[data-view=game] .field{gap:5px}
+  :root[data-view=game] .action-row button{min-height:40px}
+  :root[data-view=game] .record{margin-top:10px}
+  :root[data-game=cf] .play-area{display:flex;flex-direction:column;gap:7px}
+  :root[data-game=cf] .table-panel,:root[data-game=cf] .hand-panel{padding:9px 10px;gap:6px;border-radius:11px;overflow:visible}
+  :root[data-game=cf] .table-panel h2{font-size:18px}
+  :root[data-game=cf][data-phase=choose] .table-panel p{display:none}
+  :root[data-game=cf] .hand-title{margin-bottom:6px}
+  :root[data-game=cf] .hand-title h3{font-size:12px}
+  :root[data-game=cf] .hand-title p{font-size:10px}
+  :root[data-game=cf] .hand{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:0 0 7px}
+  :root[data-game=cf] .hand .card{height:50px;min-height:50px;font-size:17px;padding:5px;max-width:none}
+  :root[data-game=cf] .hand .card .suit{font-size:17px}
+  :root[data-game=cf] .field-label{font-size:10px}
+  :root[data-game=cf] .targets button,:root[data-game=cf] .action-row button{padding:7px 8px;font-size:11px;min-height:36px}
+  :root[data-game=cf] .controls{gap:6px}
+  :root[data-game=cf] .center-cards{gap:5px}
+  :root[data-game=cf] .reveal-item{gap:2px;font-size:10px}
+  :root[data-game=cf] .reveal-item .card{width:37px;height:44px;font-size:15px;padding:4px}
+  :root[data-game=cf] .reveal-item .card .suit{font-size:16px}
+  :root[data-game=cf] .score-delta{font-size:10px}
+  :root[data-game=cf] .result-actions button{padding:7px 11px;font-size:12px;min-height:34px}
+  :root[data-game=cf][data-phase=result] .hand{grid-template-columns:repeat(13,minmax(0,1fr));gap:3px;margin:0}
+  :root[data-game=cf][data-phase=result] .hand .card{height:33px;min-height:33px;padding:3px;font-size:11px;border-radius:4px}
+  :root[data-game=cf][data-phase=result] .hand .card .suit{font-size:11px}
+  :root[data-game=cf][data-phase=result] .controls{display:none}
+  :root[data-game=cf] .discard-section{padding:8px 7px;border-radius:10px;max-height:none;overflow:visible}
+  :root[data-game=cf] .played-title{margin-bottom:5px;gap:4px}
+  :root[data-game=cf] .played-title h3{font-size:11px}
+  :root[data-game=cf] .played-title p{font-size:9px}
+  .played-matrix{gap:3px}
+  .matrix-row{grid-template-columns:30px repeat(13,minmax(0,1fr));gap:2px}
+  .matrix-row>[role=rowheader]{font-size:10px}
+  .matrix-head{font-size:8px}
+  .spent-token{height:29px;border-radius:3px}
+  .spent-token .played-rank{font-size:10px;letter-spacing:-.4px}
+  .spent-token small{font-size:8px;margin-top:1px}
+}
+@media(max-width:359px){
+  :root[data-game=cf] .targets button,:root[data-game=cf] .action-row button{padding:7px 5px;font-size:10px}
+  :root[data-game=cf] .targets{gap:3px}
+  .matrix-row{grid-template-columns:26px repeat(13,minmax(0,1fr));gap:1px}
+  .spent-token .played-rank{font-size:9px}
+}
+
+@media(max-width:759px){
+  /* The hand controls already explain the choice; keep the ledger in view. */
+  :root[data-game=cf][data-phase=choose] .table-panel{display:none}
+  :root[data-game=cf][data-phase=result] .hand-panel{padding:6px 8px}
+  :root[data-game=cf][data-phase=result] .hand-title{margin-bottom:4px}
+  :root[data-game=cf][data-phase=result] .hand-title h3{font-size:11px}
+  :root[data-game=cf][data-phase=result] .hand .card{height:29px;min-height:29px;padding:2px}
+}
+@media(max-width:759px) and (max-height:740px){
+  :root[data-game=cf] header{height:28px}
+  :root[data-game=cf] .game-nav{padding:3px 0}
+  :root[data-game=cf] .game-nav button{padding:5px 8px}
+  :root[data-game=cf] .scoreboard{padding:4px 0}
+  :root[data-game=cf] .player{padding:4px 6px}
+  :root[data-game=cf] .player-name{font-size:10px}
+  :root[data-game=cf] .player-value strong{font-size:17px}
+  :root[data-game=cf] .status-line{line-height:1.2;margin-bottom:4px}
+  :root[data-game=cf] .hand .card{height:46px;min-height:46px}
+  :root[data-game=cf] .spent-token{height:25px}
+  :root[data-game=cf] .discard-section{padding:6px}
+  :root[data-game=cf] .played-title{margin-bottom:4px}
+  :root[data-game=cf] .played-matrix{gap:2px}
+  :root[data-game=cf] .reveal-item .card{height:36px;width:32px;padding:3px}
+  :root[data-game=cf] .table-panel{gap:4px}
+  :root[data-game=cf][data-phase=result] .hand .card{height:29px;min-height:29px}
+}
+
+/* ---------- The Last Standard ---------- */
+.decision-grid{display:flex;gap:7px;flex-wrap:wrap}.decision-grid .pill{text-transform:capitalize}
+:root[data-game=ls] .table-panel>.row{align-items:flex-start}
+:root[data-game=ls] .standard-count{font-variant-numeric:tabular-nums}
+@media(max-width:759px){
+  :root[data-game=ls] .table-panel{min-height:0}
+  :root[data-game=ls] .decision-grid{gap:4px}
+  :root[data-game=ls] .decision-grid .pill{padding:3px 7px;font-size:10px}
+  :root[data-game=ls] .defense-actions{grid-template-columns:1fr 1fr}
+  :root[data-game=ls] .defense-actions button{display:block;min-height:54px}
+  :root[data-game=ls] .defense-actions span{display:block;text-align:left;margin-top:3px}
+}
+
+</style>
+<link rel="stylesheet" href="./custom.css">
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand"><span class="brand-mark" aria-hidden="true">♠</span> Small Table</div><button class="quiet small theme" id="theme" aria-label="Switch color theme">Dark mode</button></header>
+  <main id="app"></main>
+  <footer><span>Small Table <span aria-hidden="true">·</span> Three games of imperfect information</span><span>Offline. No accounts. Just cards.</span></footer>
+</div>
+<dialog id="rules"><div class="row between"><h2 id="rules-title">Rules</h2><button class="small quiet" id="close-rules" aria-label="Close rules">Close ×</button></div><div class="rules-body" id="rules-body"></div></dialog>
+<div id="announcer" class="hidden" aria-live="polite"></div>
+<script>
+'use strict';
+/* ================================================================
+   SHARED: cards, state, scheduling, and information-limited bot views.
+   No policy function reads G. Only view builders may access game state.
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const NAMES = ['P1','P2','P3','P4'];
+const TITLES = {ls:'The Last Standard',bp:'Breaking Point',cf:'Crossfire'};
+const SUITS = ['♠','♥','♣','♦'];
+const rank = n => ({11:'J',12:'Q',13:'K',14:'A'}[n] || String(n));
+const label = c => rank(c.r)+c.s;
+const value = c => c.r===14 ? 1 : Math.min(10,c.r);
+const deck52 = () => SUITS.flatMap((s,k)=>Array.from({length:13},(_,i)=>({r:i+2,s,id:k*13+i})));
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const sample = a => a[Math.floor(Math.random()*a.length)];
+const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
+const sum = a => a.reduce((x,y)=>x+y,0);
+function weighted(items,weights){let n=Math.random()*sum(weights);for(let i=0;i<items.length;i++){n-=weights[i];if(n<=0)return items[i]}return items.at(-1)}
+function softChoice(options,temp=.3){const top=Math.max(...options.map(o=>o.utility));return weighted(options,options.map(o=>Math.exp((o.utility-top)/temp)))}
+let G=null, selected=null, target=null, timer=null, epoch=0;
+function cancel(){clearTimeout(timer);timer=null;epoch++}
+function schedule(fn){const token=epoch;timer=setTimeout(()=>{if(token===epoch&&G&&!$('rules').open)fn();else if(token===epoch&&G)schedule(fn)},650)}
+const alive = () => G.players.map((p,i)=>p.lives>0?i:-1).filter(i=>i>=0);
+function nextAlive(i){for(let n=1;n<=4;n++){const j=(i+n)%4;if(G.players[j].lives>0)return j}return i}
+function log(text){G.log.unshift(text);G.log=G.log.slice(0,60)}
+function start(type){
+  cancel();selected=null;target=null;
+  G={type,players:NAMES.map((name,i)=>({name,lives:4,score:0,hand:[],standards:[],id:i})),deck:[],discard:[],log:[],phase:'',turn:0,round:1,watching:false,result:null};
+  if(type==='ls'){
+    G.history=NAMES.map(()=>({holds:0,withdraws:0}));G.dealer=0;G.deck=shuffle(deck52());G.players.forEach(p=>{p.hand=G.deck.splice(-4)});lsNewRound();
+    log('Four lives each. First to five Standards—or last alive—wins.');
+  }else if(type==='bp'){bpNewRound(0);log('Four lives each. The first pile starts with you.');}
+  else {G.deck=shuffle(deck52());G.players.forEach(p=>{p.hand=G.deck.splice(-13)});G.spent=[[],[],[],[]];G.targetHistory=[[],[],[],[]];G.attacks=Array.from({length:4},()=>[0,0,0,0]);cfNewRound();log('Thirteen cards. Thirteen simultaneous rounds.');}
+  drive();
+}
+function home(){cancel();G=null;render()}
+function resetSelection(){selected=null;target=null}
+function loseLife(i){G.players[i].lives=Math.max(0,G.players[i].lives-1);if(!G.players[i].lives)log(NAMES[i]+' is eliminated.');}
+function finalWinners(){if(G.type==='cf'){const high=Math.max(...G.players.map(p=>p.score));return G.players.filter(p=>p.score===high).map(p=>p.id)}if(G.type==='ls'){const standardWinner=G.players.find(p=>p.standards.length>=5);if(standardWinner)return [standardWinner.id]}return alive()}
+function finishIfNeeded(){if((G.type==='cf'&&G.round>=13)||(G.type==='ls'&&G.players.some(p=>p.standards.length>=5))||(G.type!=='cf'&&alive().length===1)){G.phase='over';return true}return false}
+function continueGame(){
+  if(!G||G.phase!=='result')return;
+  if(finishIfNeeded()){drive();return}
+  resetSelection();G.result=null;
+  if(G.type==='ls'){G.round++;G.dealer=nextAlive(G.dealer);lsNewRound()}
+  else if(G.type==='bp'){G.round++;bpNewRound(G.nextStarter)}
+  else {G.round++;cfNewRound()}
+  drive();
+}
+function drive(){
+  render();
+  if(!G)return;
+  if(G.type==='ls'&&G.phase==='decide'&&lsCurrent()!==0)schedule(()=>lsDecision(lsHoldPolicy(lsView(lsCurrent()))));
+  if(G.type==='bp'&&G.phase==='add'&&G.turn!==0)schedule(()=>{const a=bpAddPolicy(bpView(G.turn));bpAdd(a.card)});
+  if(G.type==='bp'&&G.phase==='respond'&&(G.recipient!==0||!G.deck.length))schedule(()=>bpRespond(!G.deck.length?'audit':bpRespondPolicy(bpView(G.recipient))));
+}
+
+/* ================================================================
+   THE LAST STANDARD: trump contests, sequential pressure, and restraint.
+   ================================================================ */
+const SUIT_POWER={'♣':0,'♦':1,'♥':2,'♠':3};
+function lsDraw(){
+  if(!G.deck.length){G.deck=shuffle(G.discard.splice(0));log('The discard pile is reshuffled. Collected Standards stay out of circulation.');}
+  return G.deck.pop();
+}
+function lsCompare(a,b,standard){
+  const at=a.s===standard.s,bt=b.s===standard.s;
+  if(at!==bt)return at?1:-1;
+  if(a.r!==b.r)return a.r-b.r;
+  return SUIT_POWER[a.s]-SUIT_POWER[b.s];
+}
+function lsStrength(card,standard){
+  const suitEdge=SUIT_POWER[card.s]*.004;
+  return card.s===standard.s?.68+(card.r-2)/12*.32:.03+(card.r-2)/12*.57+suitEdge;
+}
+function lsView(id){
+  return {id,hand:G.players[id].hand.slice(),commit:G.commits?.[id]||null,standard:G.standard,
+    players:G.players.map(p=>({id:p.id,lives:p.lives,standards:p.standards.length})),
+    decisions:G.decisions?.slice()||[],order:G.decisionOrder?.slice()||[],decisionIndex:G.decisionIndex||0,
+    history:G.history.map(h=>({...h})),publicCards:[...G.discard,...G.players.flatMap(p=>p.standards)]};
+}
+function lsCommitPolicy(v){
+  const me=v.players[v.id],urgent=me.standards>=4||me.lives<=1;
+  const bluff=Math.random()<.18&&!urgent;
+  const choices=v.hand.map(c=>{const s=lsStrength(c,v.standard);return {card:c,utility:bluff?-s:urgent?s:-Math.abs(s-(.48+me.standards*.045))}});
+  return softChoice(choices,.16).card.id;
+}
+function lsHoldPolicy(v){
+  const me=v.players[v.id],s=lsStrength(v.commit,v.standard);
+  const rivals=v.players.filter(p=>p.lives&&p.id!==v.id&&v.decisions[p.id]!=='withdraw');
+  const count=Math.max(1,rivals.length),pWin=Math.pow(s,count),pLose=Math.pow(1-s,count);
+  const later=v.order.slice(v.decisionIndex+1).filter(i=>v.decisions[i]==='pending');
+  const expectedFolds=later.reduce((n,i)=>{const h=v.history[i];return n+(h.withdraws+1)/(h.holds+h.withdraws+3)},0);
+  const threat=rivals.some(p=>p.standards>=4)?.72:0;
+  const matchPoint=me.standards>=4?1.05:0;
+  const desperation=me.lives===1?1.55:me.lives===2?1.2:1;
+  const revealedHolders=v.decisions.filter(x=>x==='hold').length;
+  const bluffWindow=revealedHolders===0?expectedFolds*.13:0;
+  const holdUtility=pWin*(1+matchPoint)+threat+bluffWindow-pLose*desperation-s*.12-.16;
+  return softChoice([{action:'hold',utility:holdUtility},{action:'withdraw',utility:0}],.12).action;
+}
+function lsNewRound(){
+  G.standard=lsDraw();G.commits=[null,null,null,null];G.withdrawn=[null,null,null,null];
+  G.decisions=G.players.map(p=>p.lives?'pending':'out');G.decisionOrder=[];G.decisionIndex=0;G.phase='commit';
+  for(let i=1;i<4;i++)if(G.players[i].lives){const id=lsCommitPolicy(lsView(i)),ix=G.players[i].hand.findIndex(c=>c.id===id);G.commits[i]=G.players[i].hand.splice(ix,1)[0]}
+  if(!G.players[0].lives)lsBeginDecisions();
+}
+function lsCommit(cardId){
+  if(G.phase!=='commit'||!G.players[0].lives)return;
+  const ix=G.players[0].hand.findIndex(c=>c.id===cardId);if(ix<0)return;
+  G.commits[0]=G.players[0].hand.splice(ix,1)[0];resetSelection();lsBeginDecisions();drive();
+}
+function lsBeginDecisions(){
+  const first=nextAlive(G.dealer),order=[];let i=first;
+  do{order.push(i);i=nextAlive(i)}while(i!==first);
+  G.decisionOrder=order;G.decisionIndex=0;G.phase='decide';
+}
+function lsCurrent(){return G.decisionOrder[G.decisionIndex]}
+function lsDecision(action){
+  if(G.phase!=='decide'||!['hold','withdraw'].includes(action))return;
+  const id=lsCurrent();if(G.decisions[id]!=='pending')return;
+  G.decisions[id]=action;G.history[id][action==='hold'?'holds':'withdraws']++;
+  if(action==='withdraw'){
+    const card=G.commits[id];G.withdrawn[id]=card;G.commits[id]=null;G.discard.push(card);
+    log(NAMES[id]+' withdraws '+label(card)+'.');
+  }else log(NAMES[id]+' holds.');
+  const remaining=alive().filter(i=>G.decisions[i]!=='withdraw');
+  if(remaining.length===1){lsResolveUncontested(remaining[0]);drive();return}
+  G.decisionIndex++;
+  if(G.decisionIndex>=G.decisionOrder.length){lsResolveContested();drive();return}
+  drive();
+}
+function lsRefill(){
+  for(const p of G.players){
+    if(!p.lives){if(p.hand.length)G.discard.push(...p.hand);p.hand=[];continue}
+    while(p.hand.length<4)p.hand.push(lsDraw());
+  }
+}
+function lsResolveUncontested(winner){
+  const card=G.commits[winner];if(card)G.players[winner].hand.push(card);
+  G.commits[winner]=null;G.players[winner].standards.push(G.standard);
+  const text=NAMES[winner]+' claims the Standard without revealing the committed card.';
+  G.result={title:NAMES[winner]+' wins the Standard.',text,cards:[{name:'Standard',card:G.standard,note:G.standard.s+' is trump'},{name:NAMES[winner],card:null,note:'Returned unrevealed'}]};
+  log(text+' '+G.players[winner].standards.length+' of 5 Standards.');lsRefill();G.phase='result';
+}
+function lsResolveContested(){
+  const holders=alive().filter(i=>G.decisions[i]==='hold');
+  const ordered=holders.slice().sort((a,b)=>lsCompare(G.commits[b],G.commits[a],G.standard));
+  const winner=ordered[0],loser=ordered.at(-1);
+  G.players[winner].standards.push(G.standard);
+  const cards=[{name:'Standard',card:G.standard,note:G.standard.s+' is trump'},...holders.map(i=>({name:NAMES[i],card:G.commits[i],note:i===winner?'Wins':i===loser?'Loses a life':'Safe'}))];
+  for(const i of holders){G.discard.push(G.commits[i]);G.commits[i]=null}
+  loseLife(loser);lsRefill();
+  const text=NAMES[winner]+' wins the Standard. '+NAMES[loser]+' has the lowest card and loses a life.';
+  G.result={title:NAMES[winner]+' wins the contest.',text,cards};
+  log(text+' '+NAMES[winner]+': '+G.players[winner].standards.length+' Standards.');G.phase='result';
+}
+
+/* ================================================================
+   BREAKING POINT: exact engine, sampling-based private beliefs.
+   ================================================================ */
+function bpNewRound(starter){
+  G.deck=shuffle(deck52());G.discard=[];G.pile=[];G.turn=starter;G.recipient=null;G.lastAdder=null;G.phase='add';
+  G.players.forEach(p=>p.hand=p.lives?G.deck.splice(-3):[]);
+}
+function bpView(id){
+  return {id,hand:G.players[id].hand.slice(),own:G.pile.filter(x=>x.owner===id).map(x=>x.card),count:G.pile.length,forced:!G.deck.length,players:G.players.map(p=>({id:p.id,lives:p.lives,contributions:G.pile.filter(x=>x.owner===p.id).length}))};
+}
+function bpRisk(v,extra=0){
+  const known=sum(v.own.map(value))+extra,n=v.count-v.own.length;
+  if(known>21)return 1;if(n===0)return 0;
+  const excluded=new Set([...v.hand,...v.own].map(c=>c.id));
+  const pool=deck52().filter(c=>!excluded.has(c.id)).map(value),sorted=pool.slice().sort((a,b)=>a-b);
+  if(known+sum(sorted.slice(0,n))>21)return 1;
+  if(known+sum(sorted.slice(-n))<=21)return 0;
+  let bust=0;
+  for(let trial=0;trial<360;trial++){
+    // Partial Fisher–Yates: unknown contributions sampled without replacement.
+    const draw=pool.slice();let total=known;
+    for(let j=0;j<n;j++){const k=j+Math.floor(Math.random()*(draw.length-j));[draw[j],draw[k]]=[draw[k],draw[j]];total+=draw[j]}
+    if(total>21)bust++;
+  }
+  return bust/360;
+}
+function bpRespondPolicy(v){const risk=bpRisk(v);if(v.forced||risk===1)return 'audit';if(risk===0)return 'accept';return risk>.43+Math.random()*.16?'audit':'accept'}
+function bpAddPolicy(v){
+  const choices=v.hand.map(c=>({card:c,utility:-bpRisk(v,value(c))*2+value(c)*.018}));
+  const c=softChoice(choices,.1).card;
+  return {card:c.id};
+}
+function bpAdd(cardId){
+  if(G.phase!=='add')return;
+  const who=nextAlive(G.turn);
+  const p=G.players[G.turn],ix=p.hand.findIndex(c=>c.id===cardId);if(ix<0)return;
+  G.pile.push({owner:G.turn,card:p.hand.splice(ix,1)[0]});if(G.deck.length)p.hand.push(G.deck.pop());
+  G.lastAdder=G.turn;G.recipient=who;G.phase='respond';resetSelection();
+  log(NAMES[G.turn]+' adds card '+G.pile.length+' and passes to '+NAMES[who]+'.');drive();
+}
+function bpRespond(action){
+  if(G.phase!=='respond'||!['audit','accept'].includes(action))return;
+  if(action==='accept'&&G.deck.length){G.turn=G.recipient;G.phase='add';log(NAMES[G.turn]+' accepts the claim.');resetSelection();drive();return}
+  const total=sum(G.pile.map(x=>value(x.card))),loser=total>21?G.lastAdder:G.recipient;
+  loseLife(loser);G.nextStarter=G.players[loser].lives?loser:nextAlive(loser);
+  const text='The pile totals '+total+'. '+(total>21?'The last adder, ':'The auditor, ')+NAMES[loser]+', loses a life.';
+  G.result={title:total>21?'Over the limit.':'The claim holds.',text,cards:G.pile.map(x=>({name:NAMES[x.owner],card:x.card,note:value(x.card)+' points'}))};
+  log(text);G.phase='result';resetSelection();drive();
+}
+
+/* ================================================================
+   CROSSFIRE: locked simultaneous choices, public spent-card models.
+   ================================================================ */
+function cfView(id){return {id,hand:G.players[id].hand.slice(),scores:G.players.map(p=>p.score),spent:G.spent.map(a=>a.slice()),attacks:G.attacks.map(a=>a.slice()),round:G.round}}
+function cfPolicy(v){
+  const excluded=new Set([...v.hand,...v.spent.flat()].map(c=>c.id));
+  const unknown=deck52().filter(c=>!excluded.has(c.id));
+  const remaining=14-v.round,avg=unknown.length?sum(unknown.map(c=>c.r))/unknown.length:8;
+  const handMean=sum(v.hand.map(c=>c.r))/v.hand.length;
+  const opponents=[0,1,2,3].filter(i=>i!==v.id),est={};
+  for(const j of opponents){
+    const highSpent=v.spent[j].filter(c=>c.r>=11).length;
+    const expectedHigh=(v.round-1)*4/13;
+    // A behavioral estimate, not access to anyone's actual remaining hand.
+    const bias=clamp((expectedHigh-highSpent)*.12,-.45,.45);
+    const weights=unknown.map(c=>Math.exp(bias*(c.r-avg)/4));
+    est[j]={weights,total:sum(weights)};
+  }
+  const pressure={};
+  for(const j of opponents)pressure[j]=(v.attacks[j][v.id]+1)/(sum(v.attacks[j])+3);
+  const options=[];
+  for(const c of v.hand){
+    const edge={};
+    for(const j of opponents)edge[j]=sum(unknown.map((u,k)=>Math.sign(c.r-u.r)*est[j].weights[k]))/est[j].total;
+    const defense=sum(opponents.map(j=>pressure[j]*edge[j]));
+    const preserve=(c.r-handMean)*.19*(remaining-1)/12;
+    for(const j of opponents){const leader=Math.max(0,v.scores[j]-v.scores[v.id])*.018;options.push({card:c.id,target:j,utility:edge[j]+defense-preserve+leader});}
+  }
+  return softChoice(options,.38);
+}
+function cfNewRound(){
+  G.phase='choose';G.commits=[null,null,null,null];
+  // Commit bots before any human selection. Policies cannot inspect commits.
+  for(let i=1;i<4;i++)G.commits[i]=cfPolicy(cfView(i));
+}
+function cfPlay(cardId,who){
+  if(G.phase!=='choose'||![1,2,3].includes(who)||!G.players[0].hand.some(c=>c.id===cardId))return;
+  G.commits[0]={card:cardId,target:who};const before=G.players.map(p=>p.score);
+  const cards=G.players.map((p,i)=>{const ix=p.hand.findIndex(c=>c.id===G.commits[i].card);return p.hand.splice(ix,1)[0]});
+  const attacks=[];
+  for(let i=0;i<4;i++){
+    const t=G.commits[i].target,d=Math.sign(cards[i].r-cards[t].r);
+    G.players[i].score+=d;G.players[t].score-=d;G.attacks[i][t]++;
+    attacks.push(NAMES[i]+' → '+NAMES[t]+': '+(d>0?'takes 1':d<0?'pays 1':'tie'));
+    G.spent[i].push(cards[i]);G.targetHistory[i].push(t);
+  }
+  const delta=G.players[0].score-before[0];
+  G.result={title:delta>0?'P1 gains '+delta+' point'+(delta===1?'':'s')+'.':delta<0?'P1 loses '+(-delta)+' point'+(delta===-1?'':'s')+'.':'P1 breaks even.',text:'All four attacks resolve independently. Mutual attacks count twice.',cards:cards.map((c,i)=>({name:NAMES[i],card:c,note:'→ '+NAMES[G.commits[i].target],delta:G.players[i].score-before[i]})),attacks};
+  log('Round '+G.round+' · '+attacks.join(' / '));G.phase='result';resetSelection();drive();
+}
+
+/* ================================================================
+   PRESENTATION: no opponent card values rendered before a reveal.
+   ================================================================ */
+function cardHTML(c,{selectable=false,small=false,chosen=false,reveal=false}={}){
+  if(!c)return '<div class="card back" aria-label="Face-down card"></div>';
+  const cls='card'+(['♥','♦'].includes(c.s)?' red':'')+(small?' tiny':'')+(chosen?' selected':'')+(reveal?' revealed':'');
+  const inner='<span>'+rank(c.r)+'</span><span class="suit" aria-hidden="true">'+c.s+'</span>';
+  const name=rank(c.r)+' of '+({'♠':'spades','♥':'hearts','♣':'clubs','♦':'diamonds'}[c.s]);
+  return selectable?'<button class="'+cls+'" data-action="card" data-id="'+c.id+'" aria-label="Select '+name+'" aria-pressed="'+chosen+'">'+inner+'</button>':'<div class="'+cls+'" role="img" aria-label="'+name+'">'+inner+'</div>';
+}
+function renderHome(){
+  const games=[['ls','01 / Trump & restraint','The Last Standard','Commit in secret. Hold your ground—or reveal and withdraw.','4 players · First to 5 Standards','K','♠','5','♦'],['bp','02 / Risk & inference','Breaking Point','Pass the hidden pile. Know when to call its limit.','4 players · 4 lives each','7','♥','≤','21'],['cf','03 / Timing & tactics','Crossfire','Pick your card. Pick your target. Reveal together.','4 players · 13 rounds','A','♣','8','♦']];
+  return '<section class="intro"><div class="eyebrow">A little luck. A lot left unsaid.</div><h1>Small table.<br>Deep games.</h1><p>Three original card games about what you know, what you hide, and when to take a chance.</p></section><section class="games" aria-label="Choose a game">'+games.map(([id,num,title,desc,meta,a,s,b,t])=>'<article class="game-tile"><div class="eyebrow">'+num+'</div><div class="art" aria-hidden="true"><div class="mini"><span>'+a+'</span><span>'+s+'</span></div><div class="mini '+(id==='bp'?'back':t==='♦'?'red':'')+'"><span>'+b+'</span><span>'+t+'</span></div></div><h2>'+title+'</h2><p>'+desc+'</p><div class="tile-meta">'+meta+'</div><button class="primary" data-action="start" data-game="'+id+'">Play '+title+' <span aria-hidden="true">↗</span></button></article>').join('')+'</section><p class="home-note"><span class="dot"></span> All three bots play with limited information. Rules are always one click away.</p>';
+}
+function scoreboard(){
+  let active=[];if(G.phase==='add')active=[G.turn];if(G.phase==='respond')active=[G.recipient];if(G.phase==='choose'||G.phase==='commit')active=[0];if(G.phase==='decide')active=[lsCurrent()];
+  return '<section class="scoreboard" aria-label="'+(G.type==='cf'?'Scores':'Lives')+'">'+G.players.map((p,i)=>'<div class="player '+(active.includes(i)?'active ':'')+(G.type!=='cf'&&!p.lives?'out':'')+'"><div class="player-name">'+p.name+'<small>'+(i?'AI':'You')+'</small></div><div class="player-value"><strong>'+(G.type==='cf'?(p.score>0?'+':'')+p.score:p.lives)+'</strong><span>'+(G.type==='cf'?'points':G.type==='ls'?(p.lives?'lives · '+p.standards.length+' / 5 Standards':'out · '+p.standards.length+' Standards'):p.lives?'lives':'out')+'</span></div></div>').join('')+'</section>';
+}
+function targetsHTML(){return '<div class="field"><span class="field-label">Choose your target</span><div class="targets">'+G.players.filter(p=>p.id!==0&&(G.type==='cf'||p.lives)).map(p=>'<button data-action="target" data-id="'+p.id+'" class="'+(target===p.id?'selected':'')+'" aria-pressed="'+(target===p.id)+'">'+p.name+'</button>').join('')+'</div></div>'}
+function handHTML(){
+  const playable=(G.type==='ls'&&G.phase==='commit'&&G.players[0].lives)||(G.type==='bp'&&G.phase==='add'&&G.turn===0)||(G.type==='cf'&&G.phase==='choose');
+  if(G.type!=='cf'&&!G.players[0].lives)return '';
+  const sorted=G.players[0].hand.slice().sort((a,b)=>a.r-b.r||a.id-b.id);
+  let controls='';
+  if(playable){
+    controls=G.type==='bp'?'<div class="field"><span class="field-label">Passes next to '+NAMES[nextAlive(G.turn)]+'</span></div>':G.type==='cf'?targetsHTML():'';
+    const action=G.type==='ls'?'Commit card':G.type==='bp'?'Add & pass':'Reveal all four';
+    const needsTarget=G.type==='cf';
+    controls+='<div class="action-row"><button class="primary" data-action="submit" '+(selected===null||(needsTarget&&target===null)?'disabled':'')+'>'+action+'</button><span class="action-hint">'+(selected===null?'Select one of your cards.':needsTarget&&target===null?'Choose an opponent.':G.type==='cf'?'The bots’ choices are already locked.':'Ready when you are.')+'</span></div>';
+  }
+  const note=playable?(G.type==='bp'?'A = 1 · J, Q, K = 10':G.type==='ls'?'The Standard’s suit is trump.':'Choose one card. Suits do not affect rank.'):'Only you can see these cards.';
+  return '<section class="hand-panel"><div class="hand-title"><h3>P1 hand</h3><p>'+sorted.length+' cards</p></div><div class="hand" aria-label="P1 cards">'+sorted.map(c=>cardHTML(c,{selectable:playable,chosen:selected===c.id})).join('')+'</div><div class="controls">'+(playable?'<div class="action-hint">'+note+'</div>':'')+controls+'</div></section>';
+}
+function resultCards(cards){return '<div class="center-cards">'+cards.map(x=>'<div class="reveal-item"><b>'+x.name+'</b>'+cardHTML(x.card,{reveal:true})+'<span>'+x.note+'</span>'+(x.delta!==undefined?'<b class="score-delta">'+(x.delta>0?'+':'')+x.delta+' points</b>':'')+'</div>').join('')+'</div>'}
+function stageHTML(){
+  const type=G.type,p=G.phase;
+  if(p==='over'){
+    const winners=finalWinners(),win=winners.includes(0),title=win?(winners.length>1?'A shared victory.':'The table is yours.'):'Well played.';
+    const ending=type==='cf'?' Final score: '+G.players[winners[0]].score+' points.':type==='ls'&&G.players[winners[0]].standards.length>=5?' Five Standards claimed.':' Last player standing.';
+    return '<div class="eyebrow">Match complete</div><h2>'+title+'</h2><p>'+winners.map(i=>NAMES[i]).join(' & ')+(winners.length>1?' share the win.':' wins.')+ending+'</p><div class="row result-actions"><button class="primary" data-action="again">Play again</button><button data-action="home">Back to menu</button></div>';
+  }
+  if(p==='result'&&type==='cf')return '<h2>'+G.result.title+'</h2>'+resultCards(G.result.cards)+'<div class="result-actions"><button class="primary" data-action="continue">'+(G.round===13?'See final result':'Next round')+' →</button></div>';
+  if(p==='result'){
+    const dead=type!=='cf'&&!G.players[0].lives&&!G.watching&&alive().length>1;
+    const done=type==='cf'?G.round===13:alive().length===1||type==='ls'&&G.players.some(p=>p.standards.length>=5);
+    let buttons=dead?'<div class="announcement">P1 is out of lives. Watch the remaining players or start a fresh match.</div><div class="row"><button class="primary" data-action="watch">Watch table</button><button data-action="again">Play again</button><button data-action="home">Back to menu</button></div>':'<button class="primary" data-action="continue">'+(done?'See final result':'Next round')+' <span aria-hidden="true">→</span></button>';
+    return '<div class="eyebrow">'+(dead?'P1 is eliminated':'Cards on the table')+'</div><h2>'+G.result.title+'</h2><p>'+G.result.text+'</p>'+resultCards(G.result.cards)+(G.result.attacks?'<div class="action-hint">'+G.result.attacks.join('<br>')+'</div>':'')+'<div class="result-actions stack">'+buttons+'</div>';
+  }
+  if(type==='ls'){
+    const standard='<div class="reveal-item"><b>Standard</b>'+cardHTML(G.standard,{reveal:true})+'<span>'+G.standard.s+' is trump</span></div>';
+    if(p==='commit')return '<div class="eyebrow">Round '+G.round+' · '+NAMES[G.dealer]+' deals</div><h2>'+G.standard.s+' is trump.</h2><div class="row">'+standard+'<p>'+(G.players[0].lives?'Commit one card in secret. The bots have already committed theirs.':'The surviving players are committing cards.')+'</p></div>'+(G.players[0].lives?'':'<div class="loading">Cards committed</div>');
+    const current=lsCurrent(),committed=current===0&&G.commits[0]?'<div class="reveal-item"><b>P1 card</b>'+cardHTML(G.commits[0])+'<span>Committed privately</span></div>':'';
+    const decisions='<div class="decision-grid">'+G.decisionOrder.map(i=>'<span class="pill">'+NAMES[i]+' · '+(G.decisions[i]==='pending'?'waiting':G.decisions[i])+((G.withdrawn[i])?' '+label(G.withdrawn[i]):'')+'</span>').join('')+'</div>';
+    return '<div class="eyebrow">'+NAMES[current]+' decides · '+G.standard.s+' is trump</div><h2>Hold or withdraw?</h2><div class="row">'+standard+committed+'</div>'+decisions+(current===0?'<div class="defense-actions"><button class="primary" data-action="hold"><b>Hold</b><span>Stay in the contest</span></button><button data-action="withdraw"><b>Withdraw</b><span>Reveal and discard your card</span></button></div>':'<div class="loading">Reading the table</div>');
+  }
+  if(type==='bp'){
+    const own=G.pile.filter(x=>x.owner===0),known=sum(own.map(x=>value(x.card)));
+    const info='<div class="knowledge"><strong>P1 known contribution: '+known+'</strong> from '+own.length+' card'+(own.length===1?'':'s')+'. '+(G.pile.length-own.length)+' cards contributed by others.'+(own.length?'<div class="discard-row" style="margin-top:9px">'+own.map(x=>cardHTML(x.card,{small:true})).join('')+'</div>':'')+'</div>';
+    if(p==='add')return '<div class="eyebrow">Round '+G.round+' · '+G.pile.length+' cards in the pile</div><h2>'+(G.turn===0?'How much will you add?':NAMES[G.turn]+' is adding to the pile.')+'</h2><p>Keep the hidden total at 21 or less—or convince the next player that you did.</p>'+info+(G.turn?'<div class="loading">Considering the risk</div>':'');
+    return '<div class="eyebrow">'+G.pile.length+' cards · '+NAMES[G.lastAdder]+' → '+NAMES[G.recipient]+'</div><h2>“The total is 21 or less.”</h2><p>'+(G.recipient===0?'Accept and add the next card, or audit the entire pile.':NAMES[G.recipient]+' is weighing the hidden total.')+'</p>'+info+(!G.deck.length?'<div class="announcement">The draw pile is empty. An audit is required.</div>':G.recipient===0?'<div class="row"><button class="primary" data-action="accept">Accept & take turn</button><button data-action="audit">Audit the pile</button></div>':'<div class="loading">Estimating the total</div>');
+  }
+  return '<div class="eyebrow">Bots locked · P1 choice stays private</div><h2>One card. One target.</h2><p>Select a card and an opponent. P1’s card also defends every incoming attack.</p>';
+}
+function discardHTML(){
+  if(G.type!=='cf')return '';
+  const rounds=Array.from({length:13},(_,j)=>j);
+  const header='<div class="matrix-row matrix-head" role="row"><span role="columnheader">Seat</span>'+rounds.map(j=>'<span role="columnheader">'+(j+1)+'</span>').join('')+'</div>';
+  const rows=G.spent.map((cards,i)=>'<div class="matrix-row" role="row"><span role="rowheader">'+NAMES[i]+'</span>'+rounds.map(j=>{
+    const c=cards[j],who=G.targetHistory[i][j];
+    if(!c)return '<div class="spent-token unplayed" role="cell" aria-label="'+NAMES[i]+', round '+(j+1)+': not played">·</div>';
+    const description=NAMES[i]+', round '+(j+1)+': '+label(c)+', targeted '+NAMES[who];
+    return '<div class="spent-token'+(['♥','♦'].includes(c.s)?' red':'')+(j===cards.length-1?' latest':'')+'" role="cell" aria-label="'+description+'" title="'+description+'"><span class="played-rank">'+label(c)+'</span><small>→'+NAMES[who]+'</small></div>';
+  }).join('')+'</div>').join('');
+  return '<section class="discard-section"><div class="played-title"><h3>Played cards · all rounds</h3><p>Arrows show the target player</p></div><div class="played-matrix" role="table" aria-label="Played cards by player and round">'+header+rows+'</div></section>';
+}
+function recordHTML(){
+  let stats='';
+  if(G.type==='ls')stats='<div class="knowledge"><strong>Decision history</strong>'+G.history.map((h,i)=>'<div class="row between" style="margin-top:6px"><span>'+NAMES[i]+'</span><span>'+h.holds+' hold / '+h.withdraws+' withdraw</span></div>').join('')+'</div>';
+  return '<aside class="record"><h3>At the table</h3><ol class="log">'+G.log.map(t=>'<li>'+t+'</li>').join('')+'</ol>'+stats+'<div class="record-note">'+({ls:'Bots weigh trump strength, lives, Standards, decision order, and public behavior.',bp:'Bots estimate the pile using their own cards and contributions. They cannot see yours.',cf:'Bots use public discards and past targeting. Their choices lock before you play.'}[G.type])+'</div></aside>';
+}
+function render(){
+  document.documentElement.dataset.view=G?'game':'home';
+  document.documentElement.dataset.game=G?G.type:'';
+  document.documentElement.dataset.phase=G?G.phase:'home';
+  document.documentElement.dataset.spectating=String(!!G&&G.type!=='cf'&&!G.players[0].lives);
+  if(!G){$('app').innerHTML=renderHome();return}
+  const status=G.type==='cf'?'Round '+G.round+' / 13':'Round '+G.round;
+  $('app').innerHTML='<div class="game-chrome"><nav class="game-nav" aria-label="Game navigation"><button class="quiet" data-action="home">← Back to menu</button><div><div class="eyebrow">Small Table</div><h2>'+TITLES[G.type]+'</h2></div><button class="quiet" data-action="rules">Rules</button></nav>'+scoreboard()+'</div><div class="status-line"><span>'+status+'</span><span>'+(G.type==='cf'?(G.phase==='choose'?'Bots locked · ':'')+'Score total: '+sum(G.players.map(p=>p.score)):alive().length+' players remaining · '+G.deck.length+' cards in draw pile')+'</span>'+(G.watching?'<span>Watching the table</span>':'')+'</div><div class="layout"><div class="play-area"><section class="table-panel" role="region" aria-label="Current play" aria-live="polite">'+stageHTML()+'</section>'+(G.phase==='over'?'':handHTML())+discardHTML()+'</div>'+(G.type==='cf'?'':recordHTML())+'</div>';
+}
+
+/* ---------- Rules and input ---------- */
+const RULES={
+ls:'<p><strong>Goal:</strong> collect five Standards or become the last surviving player. Everyone starts with four lives and four hidden cards.</p><ol><li>Reveal a Standard. Its suit is trump. Every surviving player secretly commits one card.</li><li>Starting left of the dealer, each player chooses <strong>Hold</strong> or <strong>Withdraw</strong>. Withdrawing reveals and discards the committed card but protects your life.</li><li>If only one player remains, they claim the Standard and return their card unrevealed. Otherwise, holders reveal: any trump beats non-trump, then higher rank wins. Equal non-trump ranks use ♠ &gt; ♥ &gt; ♦ &gt; ♣.</li><li>The highest card claims the Standard. The lowest holder loses one life. Revealed cards are discarded and hands refill to four.</li><li>The dealer rotates clockwise. Collected Standards stay visible and out of circulation; discards reshuffle when needed.</li></ol><p>Holding weak can bluff opponents out, but a contested weak card may cost a life. Later players see earlier decisions and withdrawn cards.</p>',
+bp:'<p><strong>Goal:</strong> be the last player with lives. Start with four lives. Each round uses a fresh shuffled deck and three cards per surviving player. A = 1; J, Q, K = 10.</p><ol><li>Add a card face-down to the shared pile and draw a replacement. The pile passes to the next surviving player clockwise. Your claim is always <strong>“total ≤ 21.”</strong></li><li>The next player may <strong>Accept</strong>: the pile stays hidden and they must add the next card. Or <strong>Audit</strong>: reveal and total the pile.</li><li>If the total is above 21, the last adder loses one life. Otherwise, the auditor loses one life. An empty draw pile forces an audit.</li><li>After an audit, reshuffle all 52 cards and redeal. The loser starts, or the next surviving player clockwise if the loser is eliminated.</li></ol><p>At zero lives a player is eliminated. Your contributions are remembered for you, but other players’ cards remain hidden until an audit.</p>',
+cf:'<p><strong>Goal:</strong> score the most points over thirteen rounds. All 52 cards are dealt: thirteen per player. Aces are high; suits do not matter.</p><ol><li>Everyone secretly chooses one card and one opponent. All choices reveal together.</li><li>Resolve each attack separately. If your card is higher than your target’s, take one point from them. If lower, give them one point. Equal ranks transfer nothing.</li><li>Your one card also defends against every incoming attack. Mutual attacks count <strong>twice</strong>, once in each direction.</li><li>Discard the four played cards face-up. No replacements. After thirteen rounds, the highest score wins; ties share victory.</li></ol><p>Negative scores are allowed. The combined score always stays zero. Public discards remain visible for card counting. Bots commit before your selection is revealed.</p>'
+};
+$('app').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-action]');if(!b||b.disabled)return;
+  const a=b.dataset.action;
+  if(a==='start'){start(b.dataset.game);return}if(a==='home'){home();return}if(!G)return;
+  if(a==='rules'){$('rules-title').textContent=TITLES[G.type];$('rules-body').innerHTML=RULES[G.type];$('rules').showModal();return}
+  if(a==='again'){start(G.type);return}if(a==='continue'){continueGame();return}if(a==='watch'){G.watching=true;continueGame();return}
+  if(a==='card'){selected=Number(b.dataset.id);render();document.querySelector('[data-action="card"][data-id="'+selected+'"]')?.focus();return}
+  if(a==='target'){target=Number(b.dataset.id);render();document.querySelector('[data-action="target"][data-id="'+target+'"]')?.focus();return}
+  if(a==='submit'&&selected!==null&&(G.type!=='cf'||target!==null)){if(G.type==='ls')lsCommit(selected);else if(G.type==='bp')bpAdd(selected);else cfPlay(selected,target);return}
+  if(['hold','withdraw'].includes(a)&&G.type==='ls'&&G.phase==='decide'&&lsCurrent()===0)lsDecision(a);
+  if(['accept','audit'].includes(a)&&G.type==='bp'&&G.phase==='respond'&&G.recipient===0)bpRespond(a);
+});
+$('close-rules').addEventListener('click',()=>$('rules').close());
+$('rules').addEventListener('click',e=>{if(e.target===$('rules')){const r=$('rules').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('rules').close()}});
+let dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
+function setTheme(){document.documentElement.dataset.theme=dark?'dark':'light';$('theme').textContent=dark?'Light mode':'Dark mode';$('theme').setAttribute('aria-label','Switch to '+(dark?'light':'dark')+' mode')}
+$('theme').addEventListener('click',()=>{dark=!dark;setTheme()});setTheme();render();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
