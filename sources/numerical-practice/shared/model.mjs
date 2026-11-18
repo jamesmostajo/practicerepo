@@ -7,6 +7,7 @@ import {validFermiConfig} from './fermi.mjs';
 import {validCardConfig} from './cards.mjs';
 import {validDiceConfig} from './dice.mjs';
 import {validMentalConfig} from './mental.mjs';
+import {validMemoryPokerConfig} from './memory-poker.mjs';
 export const games = [
  ['arithmetic','Arithmetic sprint','Four operations. One focused sprint.','±','Foundation'],
  ['mental-math','Trading mental math','Percentages, fractions & compounding.','%','Foundation'],
@@ -18,7 +19,8 @@ export const games = [
  ['ev','EV & probability','Think in outcomes and expected value.','E','Reasoning'],
  ['series','Number series','Recognize the rule. Find what comes next.','…','Reasoning'],
  ['twenty-four','Make 24','Four cards. One target.','24','Foundation'],
-].map(([id,name,description,icon,category])=>({id,name,description,icon,category,available:['arithmetic','mental-math','dice','cards','fermi','events','trading','ev','series','twenty-four'].includes(id)}));
+ ['memory-poker','Memory poker','Memorize sixteen cards. Build the best hand.','♣','Reasoning'],
+].map(([id,name,description,icon,category])=>({id,name,description,icon,category,available:['arithmetic','mental-math','dice','cards','fermi','events','trading','ev','series','twenty-four','memory-poker'].includes(id)}));
 export const operations = ['add','subtract','multiply','divide'];
 /** @type {Record<'Easy'|'Medium'|'Hard', import('../src/lib/types').Config>} */
 export const defaults = {
@@ -35,6 +37,7 @@ export function divisionDivisors(divisors,dividends){
 }
 export function validConfig(c,game='arithmetic'){
  if(game==='twenty-four')return validTwentyFourConfig(c);
+ if(game==='memory-poker')return validMemoryPokerConfig(c);
  if(game==='series')return validSeriesConfig(c);
  if(game==='ev')return validProbabilityConfig(c);
  if(game==='mental-math')return validMentalConfig(c);
@@ -65,6 +68,7 @@ export function validateData(d){
   if(s.game==='dice'&&(!finite(s.pnl)||!finite(s.grossPnl)||!finite(s.penalties)||s.penalties<0||!Number.isInteger(s.rounds)||s.rounds!==s.config.rounds||!Number.isInteger(s.fills)||s.fills<0||s.fills>s.rounds||!finite(s.fillRate)||s.fillRate!==s.fills/s.rounds||!Number.isInteger(s.maxInventory)||s.maxInventory<0||s.maxInventory>s.config.positionLimit||Math.abs(s.pnl-(s.grossPnl-s.penalties))>1e-7||s.score!==s.pnl))throw Error('Invalid dice session metrics.');
   if(s.game==='cards'&&(!finite(s.pnl)||!finite(s.capturedEdge)||!finite(s.availableEdge)||!finite(s.missedEdge)||s.availableEdge<0||s.missedEdge<0||s.score!==s.capturedEdge||Math.abs(s.availableEdge-s.capturedEdge-s.missedEdge)>1e-7||!Number.isInteger(s.rounds)||s.rounds!==s.config.rounds||s.correct+s.errors!==s.rounds||Math.abs(s.accuracy-s.correct/s.rounds)>1e-9||!Number.isInteger(s.fills)||s.fills<0||s.fills>s.rounds||s.fillRate!==s.fills/s.rounds))throw Error('Invalid card session metrics.');
   if(s.game==='fermi'&&(!Number.isInteger(s.rounds)||s.rounds!==s.config.rounds||s.correct+s.errors!==s.rounds||Math.abs(s.accuracy-s.correct/s.rounds)>1e-9||s.score<0||s.score>100*s.rounds||!finite(s.averageScore)||Math.abs(s.averageScore-s.score/s.rounds)>1e-7||!Number.isInteger(s.answered)||s.answered<s.correct||s.answered>s.rounds||(s.answered===0?s.averageRelativeWidth!==null:(!finite(s.averageRelativeWidth)||s.averageRelativeWidth<=0))))throw Error('Invalid Fermi session metrics.');
+  if(s.game==='memory-poker'&&(!Number.isInteger(s.rounds)||s.rounds!==s.config.rounds||s.correct+s.errors!==s.rounds||Math.abs(s.accuracy-s.correct/s.rounds)>1e-9||s.score<0||s.score>100||!finite(s.averageScore)||Math.abs(s.averageScore-s.score)>1e-9))throw Error('Invalid memory poker session metrics.');
   if(['ev','series','twenty-four'].includes(s.game)&&(s.score!==s.correct||s.duration!==s.config.duration||Math.abs(s.accuracy-s.correct/Math.max(1,s.correct+s.errors))>1e-9))throw Error('Invalid reasoning drill metrics.');
   if(s.game==='trading'){
    const count=n=>Number.isInteger(n)&&n>=0&&n<=s.rounds;
