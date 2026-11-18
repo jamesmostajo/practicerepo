@@ -26,7 +26,11 @@ export interface TradingRecord extends TradingOutcome {round:TradingRound;passiv
 export interface ProbabilityConfig {duration:number;topics:string[];level:number;maxPayout:number;decimals:number}
 export interface SeriesConfig {duration:number;topics:string[];maxStart:number;maxStep:number;terms:number;showHint:boolean}
 export interface TwentyFourConfig {duration:number;target:number;maxCard:number;integerOnly:boolean}
-export type GameConfig=Config|MentalConfig|DiceConfig|CardConfig|FermiConfig|EventConfig|TradingConfig|ProbabilityConfig|SeriesConfig|TwentyFourConfig;
+export interface MemoryPokerConfig {rounds:number;memorizeSeconds:number;selectSeconds:number}
+export interface MemoryPokerRound {grid:PlayingCard[];flop:PlayingCard[]}
+export interface MemoryPokerOutcome {selection:number[];timedOut:boolean;complete:boolean;hand:string|null;category:number|null;bestHand:string;bestCategory:number;optimalPairs:[number,number][];distinctHands:number;strongerHands:number;score:number;optimal:boolean}
+export interface MemoryPokerRecord extends MemoryPokerOutcome {round:MemoryPokerRound;responseMs:number}
+export type GameConfig=Config|MentalConfig|DiceConfig|CardConfig|FermiConfig|EventConfig|TradingConfig|ProbabilityConfig|SeriesConfig|TwentyFourConfig|MemoryPokerConfig;
 export interface Session {id:string;timestamp:string;game:string;difficulty:Difficulty;score:number;accuracy:number;avgResponseMs:number;duration:number;correct:number;errors:number;config:GameConfig;pnl?:number;brier?:number;grossPnl?:number;penalties?:number;fills?:number;rounds?:number;maxInventory?:number;fillRate?:number;capturedEdge?:number;availableEdge?:number;missedEdge?:number;averageScore?:number;averageRelativeWidth?:number|null;answered?:number;calibrationBonus?:number;traderVisits?:number;forecasts?:Forecast[];passivePnl?:number;activePnl?:number;passiveFills?:number;activeFills?:number;quoteTimeouts?:number;activeTimeouts?:number}
 export interface Preset<C=GameConfig>{id:string;game:string;name:string;config:C}
 export interface Data{version:1;sessions:Session[];presets:Preset[]}
